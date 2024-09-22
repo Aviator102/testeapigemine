@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Ado Rei do Aviator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+        #chat {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background: white;
+        }
+        #message {
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chat Ado Rei do Aviator</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Digite sua mensagem..." />
+    <input type="file" id="fileInput" />
+    <button id="sendButton">Enviar</button>
+
+    <script>
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const message = document.getElementById('message').value;
+            const fileInput = document.getElementById('fileInput');
+            const chat = document.getElementById('chat');
+
+            if (message) {
+                chat.innerHTML += `<div>${message}</div>`;
+                document.getElementById('message').value = '';
+            }
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Enviar arquivo para o backend
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    chat.innerHTML += `<div>Análise: ${JSON.stringify(data)}</div>`;
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
