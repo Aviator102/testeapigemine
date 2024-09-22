@@ -1,18 +1,32 @@
-module.exports = (req, res) => {
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
     if (req.method === 'POST') {
         const { message } = req.body;
 
-        // Aqui você pode implementar a lógica para gerar respostas
-        let response;
-        if (message.toLowerCase() === 'oi') {
-            response = 'Olá! Como posso ajudar você hoje?';
-        } else if (message.toLowerCase() === 'tudo bem?') {
-            response = 'Tudo ótimo, obrigado por perguntar! E você?';
-        } else {
-            response = 'Desculpe, não entendi a sua mensagem.';
-        }
+        // Substitua isso pela URL correta da API do Gemine, se necessário
+        const apiUrl = 'https://api.gemine.com/your-endpoint'; // Atualize para o endpoint correto da IA do Gemine
+        const apiKey = 'AIzaSyDKHfinTQUDi3yxUeFSn0bSLWgtmCECpp4';
 
-        return res.status(200).json({ response });
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}` // Se necessário, ajuste o cabeçalho de autorização
+                },
+                body: JSON.stringify({ prompt: message }) // Ajuste de acordo com a API do Gemine
+            });
+
+            const data = await response.json();
+            // Ajuste o acesso à resposta com base na estrutura da resposta da API
+            const gemineResponse = data.response || 'Desculpe, não consegui entender isso.';
+
+            return res.status(200).json({ response: gemineResponse });
+        } catch (error) {
+            console.error('Erro ao conectar com a API do Gemine:', error);
+            return res.status(500).json({ response: 'Desculpe, ocorreu um erro ao conectar com a IA.' });
+        }
     } else {
         return res.status(405).json({ error: 'Método não permitido.' });
     }
